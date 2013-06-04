@@ -1,0 +1,68 @@
+<html>
+<head>
+<title>duell admin</title>
+</head>
+<body>
+<script src="jquery-2.0.2.min.js" type="text/javascript"></script>
+<div align="center">
+    <div id="cleft">
+        <button id="init" style="width:200px;">init</button><br>
+        <button id="loadg1" style="width:200px;">Game 1</button><br>
+    </div>
+    <div style="height:50px;"><br></div>
+    <div id="cleft">
+        <button id="loadr0" style="width:200px;">Round 1</button>
+        <button id="loadr1" style="width:200px;">Round 2</button>
+        <button id="loadr2" style="width:200px;">Round 3</button>
+        <button id="loadr3" style="width:200px;">Round 4</button>
+    </div>
+    <div style="height:50px;"><br></div>
+    <div id="cleft">
+        <button id="solver0" style="width:200px;">Answer1</button><br>
+        <button id="solver1" style="width:200px;">Answer2</button><br>
+        <button id="solver2" style="width:200px;">Answer3</button><br>
+        <button id="solver3" style="width:200px;">Answer4</button><br>
+        <button id="solver4" style="width:200px;">Answer5</button><br>
+        <button id="solver5" style="width:200px;">Answer6</button><br>
+        <button style="width:200px;">Wrong</button><br>
+        <button style="width:100px;">team a</button>
+        <button style="width:100px;">team b</button>
+    </div>
+    <div style="height:50px;"><br></div>
+    <div id="cleft">
+        <select style="width:200px;"><option value="foo">bar</option></select><button style="width:40px;">Set</button>
+        <button style="width:40px;">Set</button><select style="width:200px;"><option value="foo">bar</option></select><br>
+        <select style="width:200px;"><option value="foo">bar</option></select><button style="width:40px;">Set</button>
+        <button style="width:40px;">Set</button><select style="width:200px;"><option value="foo">bar</option></select><br>
+        <select style="width:200px;"><option value="foo">bar</option></select><button style="width:40px;">Set</button>
+        <button style="width:40px;">Set</button><select style="width:200px;"><option value="foo">bar</option></select><br>
+        <select style="width:200px;"><option value="foo">bar</option></select><button style="width:40px;">Set</button>
+        <button style="width:40px;">Set</button><select style="width:200px;"><option value="foo">bar</option></select><br>
+        <select style="width:200px;"><option value="foo">bar</option></select><button style="width:40px;">Set</button>
+        <button style="width:40px;">Set</button><select style="width:200px;"><option value="foo">bar</option></select><br>
+        <select style="width:200px;"><option value="foo">bar</option></select><button style="width:40px;">Set</button>
+        <button style="width:40px;">Set</button><select style="width:200px;"><option value="foo">bar</option></select><br>
+        <button style="width:100px;">20s</button>
+        <button style="width:100px;">hide</button>
+        <button style="width:100px;">25s</button>
+    </div>
+    <div>
+        <button id="quit" style="width:200px;">Quit</button>
+    </div>
+</body>
+<script type="text/javascript">
+$("#init").click(function() {$.get("sddo?init&0") })
+$("#quit").click(function() {$.get("sddo?quit&0") })
+$("#loadg1").click(function() {$.get("sddo?load&g1") })
+$("#loadr0").click(function() {$.get("sddo?setround&0") })
+$("#loadr1").click(function() {$.get("sddo?setround&1") })
+$("#loadr2").click(function() {$.get("sddo?setround&2") })
+$("#loadr3").click(function() {$.get("sddo?setround&3") })
+$("#solver0").click(function() {$.get("sddo?solve&0") })
+$("#solver1").click(function() {$.get("sddo?solve&1") })
+$("#solver2").click(function() {$.get("sddo?solve&2") })
+$("#solver3").click(function() {$.get("sddo?solve&3") })
+$("#solver4").click(function() {$.get("sddo?solve&4") })
+$("#solver5").click(function() {$.get("sddo?solve&5") })
+</script>
+</html>
