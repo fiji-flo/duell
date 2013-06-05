@@ -67,6 +67,7 @@ Tschernobyl;1
 RAF-Zeit;1
 Unabh. Indiens;1
 #final
+#fin1
 Nenne eine Funktion:
 e-Funktion;24
 f(x);8
@@ -74,7 +75,7 @@ Sinus;8
 x^2:6
 identitaet;4
 Hamilton-Fkt.;2
-Hyperbel:2
+Hyperbel;2
 Keine Ahnung;2
 gauss-fkt;2
 lineare funktion;2
@@ -113,6 +114,7 @@ F5;1
 fick dich (NAME);1
 foo;1
 fourier;1
+#fin2
 Nenne eine Sportart:
 fussball;16
 Schwimmen;7
@@ -154,6 +156,7 @@ Fechten;1
 golf;1
 Judo;1
 kajak;1
+#fin3
 Nenne eine Zahl zwischen 0 und 10:
 5;12
 4;12
@@ -174,6 +177,7 @@ bier;1
 4,2;1
 11;1
 115;1
+#fin4
 Nenne eine Schnapssorte:
 wodka;14
 williams christ birne;11
@@ -191,6 +195,7 @@ Sambuca;2
 Schnaps;2
 topi;1
 unicum;1
+#fin5
 Nenne einen Laptophersteller:
 Apple;15
 Dell;15
