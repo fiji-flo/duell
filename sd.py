@@ -70,8 +70,6 @@ def srvr(q, r, x):
                     httpd._handle_request_noblock()
         finally:
             pass
-
-
         
 
     def start_server():
@@ -154,6 +152,12 @@ class Game(object):
         self.solved_fin_a = {}
         self.solved_fin_b = {}
         self.wrongs = 0
+        self.counting = False
+        self.counter = 0
+        self.counter_last = None
+        self.wrong_final = False
+        self.points = 0
+        self.rtype = ""
 
     def add_round(self, r):
         self._rounds[r.num-1] = r
@@ -167,6 +171,8 @@ class Game(object):
         self.solved = []
         self.wrongs = 0
         self._cur_round = self._rounds[n]
+        self.alen = 20
+        self.points = 0
 
     def set_final(self):
         self.rtype = "final"
@@ -177,7 +183,11 @@ class Game(object):
         self.solving_start = 0
         self.solved_fin_a = {}
         self.solved_fin_b = {}
+        self.points_fin_a = 0
+        self.points_fin_b = 0
         self.wrongs = 0
+        self.alen = 16
+        self.points = 0
 
     def set_team_a(self, name, points=0):
         self.team_a = Team(name, points) 
@@ -200,7 +210,6 @@ class Game(object):
         for i in self.solved:
             p += (self._cur_round.answers[i][1]*self._cur_round.mult)
         team.points = p
-
 
     def get_mult(self):
         if self._cur_round:
@@ -226,6 +235,16 @@ class Game(object):
     def wrong(self):
         self._cur_round.wrongs = min(self._cur_round.wrongs, 3)
 
+    def solve_finala(self, q, i):
+        self.final.solved_a[q] = i
+
+    def solve_finalb(self, q, i):
+        self.final.solved_b[q] = i
+
+    def set_timer(self, t):
+        self.counting = True
+        self.counter = t
+        self.counter_last = time.time()
 
 
 class Renderer(object):
@@ -245,12 +264,13 @@ class Renderer(object):
         self._clock=pygame.time.Clock()
         self._big_font_size = self._height // 12
         self._small_font_size = self._height // 16
+        self._tiny_font_size = self._height // 24
         self._big_font = pygame.font.SysFont("DejaVu Sans Mono", self._big_font_size)
         self._small_font = pygame.font.SysFont("DejaVu Sans Mono", self._small_font_size)
+        self._tiny_font = pygame.font.SysFont("DejaVu Sans Mono", self._tiny_font_size)
         self._frame_count = 0
         self._frame_rate = 60
         self._title = "Studierenden Duell 2013"
-        self._alen = 20
         self._sound_answer = pygame.mixer.Sound("answer.wav")
         self._sound_points = pygame.mixer.Sound("points.wav")
         self._sound_wrong = pygame.mixer.Sound("wrong.wav")
@@ -296,7 +316,7 @@ class Renderer(object):
             if game.solving and game.solving_num == i:
                 a,p = self.solve_answer(i, game, a, p)
             elif not i in game.solved:
-                a = "."*self._alen
+                a = "."*game.alen
                 p = "--"
             self.draw_answer(i, a, p) 
         self.draw_points(game)
@@ -324,21 +344,45 @@ class Renderer(object):
         if game.wrongs < game.get_wrongs():
             game.wrongs += 1
             self._sound_wrong.play()
-        output_string = '{} {:<3}'.format(game.get_round().points, "X"*game.get_wrongs())
+        output_string = '{} {:<3}'.format(game.points, "X"*game.get_wrongs())
         text = self._small_font.render(output_string,True,self._green)
         self._screen.blit(text, [self.center(text), snd_last_y])
         output_string = '{}x'.format(game.get_mult())
         text = self._small_font.render(output_string,True,self._green)
         self._screen.blit(text, [self.center(text), last_y])
 
+    def draw_points_final(self, game):
+        last_y = self._height - self._big_font.get_linesize()
+        snd_last_y = last_y - self._big_font.get_linesize()
+        # a
+        output_string = '{}'.format(game.points)
+        text = self._big_font.render(output_string,True,self._green)
+        self._screen.blit(text, [(self._width / 2) - (text.get_size()[0]/2), snd_last_y])
+
+        #timer
+        if game.counting:
+            if game.counter == 0:
+                self._sound_wrong.play()
+                game.counting = False
+            if time.time() > game.counter_last + 1:
+                game.counter_last += 1
+                game.counter -= 1
+            output_string = '{}'.format(game.counter)
+            text = self._big_font.render(output_string,True,self._green)
+            self._screen.blit(text, [self.center(text), self._height - self._big_font.get_linesize()])
+
+        if game.wrong_final:
+            game.wrong_final = False
+            self._sound_wrong.play()
+
     def draw_final(self, game):
         for i in range(5):
             a,p = None, None
             if not i in game.solved_fin_a.keys() or game.final.hide:
-                a = "."*self._alen
+                a = "."*game.alen
                 p = "--"
             else:
-                a,p = game.final.questions[i][game.solved_fin_a[i]]
+                a,p = game.final.questions[i].answers[game.solved_fin_a[i]]
             if i in game.final.solved_a.keys() and not i in game.solved_fin_a.keys():
                 game.solving_a = True
                 game.solving_num = i
@@ -348,12 +392,30 @@ class Renderer(object):
                 self._sound_answer.play()
             if game.solving_a and game.solving_num == i:
                 a,p = self.solve_answer(i, game, a, p)
-            self.draw_answer(i, a, p) 
-        #self.draw_points(game)
+            self.draw_answer_final_a(i, a, p) 
+        for i in range(5):
+            a,p = None, None
+            if not i in game.solved_fin_b.keys() or game.final.hide:
+                a = "."*game.alen
+                p = "--"
+            else:
+                a,p = game.final.questions[i].answers[game.solved_fin_b[i]]
+            if i in game.final.solved_b.keys() and not i in game.solved_fin_b.keys():
+                game.solving_b = True
+                game.solving_num = i
+                game.solving_state = 1
+                game.solving_start = self._frame_count
+                game.solved_fin_b[i] = game.final.solved_b[i]
+                self._sound_answer.play()
+            if game.solving_b and game.solving_num == i:
+                a,p = self.solve_answer(i, game, a, p)
+            self.draw_answer_final_b(i, a, p) 
+        self.draw_points_final(game)
         
     def solve_answer(self, num, game, a, p):
         #a,p = game.get_round().answers[game.solving_num]
-        if game.solving_state == self._alen:
+        if game.solving_state == game.alen:
+            game.points += p
             self._sound_points.play()
             game.solving = False
             game.solving_a = False
@@ -362,7 +424,7 @@ class Renderer(object):
             p = "--"
         n = min(game.solving_state, len(a))
         m = game.solving_state - n
-        s = "{}{}{}".format(a[:n], " "*m, "."*(self._alen - (n+m)))
+        s = "{}{}{}".format(a[:n], " "*m, "."*(game.alen - (n+m)))
         game.solving_state += ((self._frame_count - game.solving_start) % 5) // 4
         return s,p
 
@@ -374,8 +436,22 @@ class Renderer(object):
         self._screen.blit(text, [self.center(text),y])
 
 
-    def draw_answer(self, num, atext="."*16, points="--"):
+    def draw_answer_final_a(self, num, atext="."*12, points="--"):
         y = ((self._height * 0.7) / 5) * 0.9 * (num + 1)
+        display_text = '{}: {:<16} {:>2}'.format((num + 1), atext.encode("utf-8"), points)
+        text = self._tiny_font.render(display_text, True, self._green)
+        self._screen.blit(text, [self._width*0.02,y])
+
+
+    def draw_answer_final_b(self, num, atext="."*12, points="--"):
+        y = ((self._height * 0.7) / 5) * 0.9 * (num + 1)
+        display_text = '{:>2} {:<16} :{}'.format(points, atext.encode("utf-8"), (num+1))
+        text = self._tiny_font.render(display_text, True, self._green)
+        self._alen = 20
+        self._screen.blit(text, [self._width*0.98-text.get_size()[0],y])
+
+    def draw_answer(self, num, atext="."*16, points="--"):
+        y = ((self._height * 0.7) / 6) * 0.9 * (num + 1)
         display_text = '{}: {:<20} {:>2}'.format((num + 1), atext.encode("utf-8"), points)
         text = self._small_font.render(display_text, True, self._green)
         self._screen.blit(text, [self.center(text),y])
@@ -434,6 +510,27 @@ class Session(object):
         elif c[0] == "setpointsb":
             self.game.team_b.points = int(c[1])
             self._r.put("0")
+        elif c[0] == "setfinb":
+            self.game.solve_finalb(int(c[1]), int(c[2]))
+            self._r.put("0")
+        elif c[0] == "setfina":
+            self.game.solve_finala(int(c[1]), int(c[2]))
+            self._r.put("0")
+        elif c[0] == "settimer":
+            self.game.set_timer(int(c[1]))
+            self._r.put("0")
+        elif c[0] == "wrongfinal":
+            self.game.wrong_final = True
+            self._r.put("0")
+        elif c[0] == "finalhide":
+            self.game.final.hide = not self.game.final.hide
+            self._r.put("0")
+        elif c[0] == "showidle":
+            self.game.rtype = ""
+            self._r.put("0")
+
+
+
 
     def run(self):
         self.running = False

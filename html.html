@@ -11,7 +11,8 @@
         <button id="showanswers" style="width:100px;">Answers</button>
         <button id="showfinal" style="width:100px;">Final</button><br>
         <input id="gname" style="width:100px;"></input>
-        <button id="loadg" style="width:100px;">Load</button>
+        <button id="loadg" style="width:100px;">Load</button><br>
+        <button id="showidle" style="width:200px;">Idle</button>
     </div>
     <div id="rounds">
         <div style="height:30px;"><br></div>
@@ -31,7 +32,7 @@
         <button id="solver3" style="width:200px;">Answer4</button><br>
         <button id="solver4" style="width:200px;">Answer5</button><br>
         <button id="solver5" style="width:200px;">Answer6</button><br>
-        <button style="width:200px;">Wrong</button><br>
+        <button id="wrong1" style="width:200px;">Wrong</button><br>
         <button id="set_taname" style="width:50px;">Set</button>
         <input id="tanamei" style="width:100px;"></input>
         <input id="tbnamei" style="width:100px;"></input>
@@ -45,56 +46,45 @@
     </div>
     <div id="final">
         <div style="height:30px;"><br></div>
-        <select style="width:200px;">
+        <select id="fa0" style="width:200px;">
             <option value="foo">bar</option>
-        </select><button style="width:40px;">Set</button>
-        <button style="width:40px;">Set</button>
-        <select style="width:200px;">
-            <option value="foo">bar</option>
-        </select><br>
-        <div style="height:30px;"><br></div>
-        <select style="width:200px;">
-            <option value="foo">bar</option>
-        </select><button style="width:40px;">Set</button>
-        <button style="width:40px;">Set</button>
-        <select style="width:200px;">
+        </select><button id="set_fa0" style="width:40px;">Set</button>
+        <button id="set_fb0" style="width:40px;">Set</button>
+        <select id="fb0" style="width:200px;">
             <option value="foo">bar</option>
         </select><br>
-        <div style="height:30px;"><br></div>
-        <select style="width:200px;">
+        <select id="fa1" style="width:200px;">
             <option value="foo">bar</option>
-        </select><button style="width:40px;">Set</button>
-        <button style="width:40px;">Set</button>
-        <select style="width:200px;">
-            <option value="foo">bar</option>
-        </select><br>
-        <div style="height:30px;"><br></div>
-        <select style="width:200px;">
-            <option value="foo">bar</option>
-        </select><button style="width:40px;">Set</button>
-        <button style="width:40px;">Set</button>
-        <select style="width:200px;">
+        </select><button id="set_fa1" style="width:40px;">Set</button>
+        <button id="set_fb1" style="width:40px;">Set</button>
+        <select id="fb1" style="width:200px;">
             <option value="foo">bar</option>
         </select><br>
-        <div style="height:30px;"><br></div>
-        <select style="width:200px;">
+        <select id="fa2" style="width:200px;">
             <option value="foo">bar</option>
-        </select><button style="width:40px;">Set</button>
-        <button style="width:40px;">Set</button>
-        <select style="width:200px;">
-            <option value="foo">bar</option>
-        </select><br>
-        <div style="height:30px;"><br></div>
-        <select style="width:200px;">
-            <option value="foo">bar</option>
-        </select><button style="width:40px;">Set</button>
-        <button style="width:40px;">Set</button>
-        <select style="width:200px;">
+        </select><button id="set_fa2" style="width:40px;">Set</button>
+        <button id="set_fb2" style="width:40px;">Set</button>
+        <select id="fb2" style="width:200px;">
             <option value="foo">bar</option>
         </select><br>
-        <button style="width:100px;">20s</button>
-        <button style="width:100px;">hide</button>
-        <button style="width:100px;">25s</button>
+        <select id="fa3" style="width:200px;">
+            <option value="foo">bar</option>
+        </select><button id="set_fa3" style="width:40px;">Set</button>
+        <button id="set_fb3" style="width:40px;">Set</button>
+        <select id="fb3" style="width:200px;">
+            <option value="foo">bar</option>
+        </select><br>
+        <select id="fa4" style="width:200px;">
+            <option value="foo">bar</option>
+        </select><button id="set_fa4" style="width:40px;">Set</button>
+        <button id="set_fb4" style="width:40px;">Set</button>
+        <select id="fb4" style="width:200px;">
+            <option value="foo">bar</option>
+        </select><br>
+        <button id="set_timer20" style="width:100px;">20s</button>
+        <button id="finalhide" style="width:100px;">hide</button>
+        <button id="set_timer25" style="width:100px;">25s</button><br>
+        <button id="wrong2" style="width:200px;">Wrong</button><br>
     </div>
     <div>
         <div style="height:30px;"><br></div>
@@ -147,6 +137,14 @@ function solve(i) {
     }
     return f;
 }
+function set_final(i, c) {
+    var f = function() {
+        a = $("#f"+c+i).val();
+        n = a.split("#")[0];
+        $.get("sddo?setfin"+c+"&"+i+"&"+n)
+    }
+    return f;
+}
 
 $("#init").click(function() {$.get("sddo?init&0") });
 $("#showrounds").click(function() {$("#rounds").toggle() });
@@ -154,9 +152,15 @@ $("#showanswers").click(function() {$("#answers").toggle() });
 $("#showfinal").click(function() {$("#final").toggle() });
 $("#quit").click(function() {$.get("sddo?quit&0") });
 $("#loadg").click(load_game());
+$("#wrong1").click(function() {$.get("sddo?wrong&0") });
+$("#wrong2").click(function() {$.get("sddo?wrongfinal&0") });
+$("#finalhide").click(function() {$.get("sddo?finalhide&0") });
+$("#showidle").click(function() {$.get("sddo?showidle&0") });
 
 $("#ta").click(function() {$.get("sddo?pointsta&0")});
 $("#tb").click(function() {$.get("sddo?pointstb&0")});
+$("#set_timer20").click(function() {$.get("sddo?settimer&20")});
+$("#set_timer25").click(function() {$.get("sddo?settimer&25")});
 
 
 $("#pa").click(set_points("a"));
@@ -168,19 +172,29 @@ for (var i = 0; i < 4; i++) {
     $("#setround"+i).click(set_round(i));
 }
 
+for (var i = 0; i < 5; i++) {
+    $("#set_fa"+i).click(set_final(i, "a"));
+    $("#set_fb"+i).click(set_final(i, "b"));
+}
+
 for (var i = 0; i < 6; i++) {
     $("#solver"+i).click(solve(i));
 }
 $("#setfinal").click(function() {
-    var l = $.get("sddo?setfinal&0");
-    var qs = l.split("####");
-    for (var i = 0; i < 5; i++) {
-        var as = qs[i].split("###")[1].split("##");
-        for (var j = 0; j < as.length; j++) {
+    $.get("sddo?setfinal&0", function(data) {
+        var qs = data.split("####");
+        for (var i = 0; i < 5; i++) {
+            var as = qs[i].split("###")[1].split("##");
+            var s = ""
+            for (var j = 0; j < as.length; j++) {
+                s += "<option>"+j+"#"+as[j]+"</option>\n";
+            }
+            $("#fb"+(i)).html(s);
+            $("#fa"+(i)).html(s);
         }
-    }
-    $("#final").show();
-    $("#answers").hide();
+        $("#final").show();
+        $("#answers").hide();
+    });
 });
 function set_answers(data, num) {
     var l = data.split("###")
