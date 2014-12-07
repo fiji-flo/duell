@@ -6,6 +6,7 @@ import select
 import urllib
 import errno
 import os
+import sys
 
 from multiprocessing import Process, Queue
 
@@ -259,7 +260,7 @@ class Game(object):
 
 
 class Renderer(object):
-    def __init__(self):
+    def __init__(self, title=""):
         self._black = ( 0, 0, 0)
         self._white = ( 255, 255, 255)
         self._green = ( 0, 255, 0)
@@ -281,7 +282,7 @@ class Renderer(object):
         self._tiny_font = pygame.font.SysFont("DejaVu Sans Mono", self._tiny_font_size)
         self._frame_count = 0
         self._frame_rate = 60
-        self._title = "Studierenden Duell 2013"
+        self._title = title
         self._sound_answer = pygame.mixer.Sound("answer.wav")
         self._sound_points = pygame.mixer.Sound("points.wav")
         self._sound_wrong = pygame.mixer.Sound("wrong.wav")
@@ -476,11 +477,12 @@ class Renderer(object):
 
 
 class Session(object):
-    def __init__(self, q,r,x):
+    def __init__(self, q,r,x, title):
         self.game = None
         self._q = q
         self._r = r
         self._x = x
+        self._title = title
 
     def do(self,cmd):
         c = cmd.split("&")
@@ -561,7 +563,7 @@ class Session(object):
         self._r.put("0")
 
 
-        r = Renderer()
+        r = Renderer(self._title)
         while not r.render(self.game) and self.running:
             if not self._q.empty():
                 self.do(self._q.get())
@@ -570,13 +572,16 @@ class Session(object):
 
 
 def main():
+    title = "Studierenden Duell"
+    if len(sys.argv) > 1:
+        title = sys.argv[1]
     q = Queue()
     r = Queue()
     x = Queue()
 
     recvr = Process(target=srvr, args=(q,r,x))
     recvr.start()
-    s = Session(q,r,x)
+    s = Session(q,r,x, title)
     s.run()
     r.put("stopit")
     recvr.join()
