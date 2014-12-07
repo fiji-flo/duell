@@ -26,6 +26,7 @@
     </div>
     <div id="answers">
         <div style="height:30px;"><br></div>
+        <button id="wrongsound" style="width:200px;">Wrong(non counting)</button><br>
         <button id="solver0" style="width:200px;">Answer1</button><br>
         <button id="solver1" style="width:200px;">Answer2</button><br>
         <button id="solver2" style="width:200px;">Answer3</button><br>
@@ -156,6 +157,7 @@ $("#wrong1").click(function() {$.get("sddo?wrong&0") });
 $("#wrong2").click(function() {$.get("sddo?wrongfinal&0") });
 $("#finalhide").click(function() {$.get("sddo?finalhide&0") });
 $("#showidle").click(function() {$.get("sddo?showidle&0") });
+$("#wrongsound").click(function() {$.get("sddo?wrongsound&0") });
 
 $("#ta").click(function() {$.get("sddo?pointsta&0")});
 $("#tb").click(function() {$.get("sddo?pointstb&0")});

@@ -5,6 +5,7 @@ import BaseHTTPServer
 import select
 import urllib
 import errno
+import os
 
 from multiprocessing import Process, Queue
 
@@ -25,7 +26,7 @@ def srvr(q, r, x):
             print(s.headers)
             #r, msg = s.deal_get()
             #print(str(r)+": "+msg)
-            
+
             s.send_response(200)
             if "jquery-2.0.2.min.js" in s.path:
                 s.send_header("Content-type", "text/javascript")
@@ -70,7 +71,7 @@ def srvr(q, r, x):
                     httpd._handle_request_noblock()
         finally:
             pass
-        
+
 
     def start_server():
         server_class = BaseHTTPServer.HTTPServer
@@ -81,7 +82,7 @@ def srvr(q, r, x):
         except KeyboardInterrupt:
             httpd.server_close()
             print(time.asctime(), "Server Stops - %s:%s" % ("127.0.0.1", 8001))
-            return    
+            return
         httpd.server_close()
         print(time.asctime(), "Server Stops - %s:%s" % ("127.0.0.1", 8001))
 
@@ -158,6 +159,7 @@ class Game(object):
         self.wrong_final = False
         self.points = 0
         self.rtype = ""
+        self.play_wrongsound = False
 
     def add_round(self, r):
         self._rounds[r.num-1] = r
@@ -190,15 +192,15 @@ class Game(object):
         self.points = 0
 
     def set_team_a(self, name, points=0):
-        self.team_a = Team(name, points) 
+        self.team_a = Team(name, points)
 
     def set_team_b(self, name, points=0):
-        self.team_b = Team(name, points) 
+        self.team_b = Team(name, points)
 
     def check(self):
         if self._rounds.keys() != list(range(1,5)):
             return False
-    
+
     def get_wrongs(self):
         if self._cur_round:
             return self._cur_round.wrongs
@@ -221,19 +223,28 @@ class Game(object):
         return self._cur_round
 
     def load(self, filename):
-        l = open(filename).read()
-        rnds,f = l.split("#final")
-        rnds = rnds.strip().split("#round")
-        for rnd in rnds[1:]:
-            r = Round(rnd.strip())
+        try:
+            l = open(filename).read()
+            rnds,f = l.split("#final")
+            rnds = rnds.strip().split("#round")
+            rnds_to_load = []
+            for rnd in rnds[1:]:
+                r = Round(rnd.strip())
+                rnds_to_load.append(r)
+            final = Final(f.strip())
+        except:
+            print("error loading {}".format(filename))
+            return
+
+        for r in rnds_to_load:
             self.add_round(r)
-        self.final = Final(f.strip())
-                
+        self.final = final
+
     def solve(self, num):
         self._cur_round.solved.append(num)
 
     def wrong(self):
-        self._cur_round.wrongs = min(self._cur_round.wrongs, 3)
+        self._cur_round.wrongs = min(self._cur_round.wrongs + 1, 3)
 
     def solve_finala(self, q, i):
         self.final.solved_a[q] = i
@@ -320,6 +331,9 @@ class Renderer(object):
                 p = "--"
             self.draw_answer(i, a, p) 
         self.draw_points(game)
+        if game.play_wrongsound:
+            self._sound_wrong.play()
+            game.play_wrongsound = False
 
     def draw_points(self, game):
         last_y = self._height - self._small_font.get_linesize()
@@ -392,7 +406,7 @@ class Renderer(object):
                 self._sound_answer.play()
             if game.solving_a and game.solving_num == i:
                 a,p = self.solve_answer(i, game, a, p)
-            self.draw_answer_final_a(i, a, p) 
+            self.draw_answer_final_a(i, a, p)
         for i in range(5):
             a,p = None, None
             if not i in game.solved_fin_b.keys() or game.final.hide:
@@ -409,9 +423,9 @@ class Renderer(object):
                 self._sound_answer.play()
             if game.solving_b and game.solving_num == i:
                 a,p = self.solve_answer(i, game, a, p)
-            self.draw_answer_final_b(i, a, p) 
+            self.draw_answer_final_b(i, a, p)
         self.draw_points_final(game)
-        
+
     def solve_answer(self, num, game, a, p):
         #a,p = game.get_round().answers[game.solving_num]
         if game.solving_state == game.alen:
@@ -471,11 +485,14 @@ class Session(object):
     def do(self,cmd):
         c = cmd.split("&")
         if c[0] == "load":
-            self.game = Game()
-            self.game.set_team_a("")
-            self.game.set_team_b("")
-            self.game.load(c[1])
-            self._r.put("done")
+            if os.access(c[1], os.R_OK):
+                self.game = Game()
+                self.game.set_team_a("")
+                self.game.set_team_b("")
+                self.game.load(c[1])
+                self._r.put("done")
+            else:
+                self._r.put("0")
         elif c[0] == "setround":
             self.game.set_round(int(c[1]))
             self._r.put(self.game.get_round().get_data())
@@ -528,6 +545,9 @@ class Session(object):
         elif c[0] == "showidle":
             self.game.rtype = ""
             self._r.put("0")
+        elif c[0] == "wrongsound":
+            self.game.play_wrongsound = True
+            self._r.put("0")
 
 
 
@@ -538,13 +558,14 @@ class Session(object):
             time.sleep(0.1)
         if "init" in self._q.get():
             self.running = True
-        
-        
+        self._r.put("0")
+
+
         r = Renderer()
         while not r.render(self.game) and self.running:
             if not self._q.empty():
                 self.do(self._q.get())
-        
+
         pygame.quit ()
 
 
