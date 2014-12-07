@@ -8,7 +8,7 @@ condition.
 About
 =====
 
-Family Feud (german: Familien Duell)
+Family Feud (German: Familien Duell)
 http://en.wikipedia.org/wiki/Family_Feud
 http://de.wikipedia.org/wiki/Familien-Duell
 
@@ -56,7 +56,7 @@ Click on *Initialize Game Screen*. The game field should appear.
 ### Load a Game
 
 To load a game, put the game description file into the repository root
-directory. Next go to the web interface and enter the exact filename into
+directory. Next go to the web interface and enter the exact file name into
 the input field right in front of the *Load Game* button. Press the button to
 set up the new game.
 
@@ -67,11 +67,11 @@ names into the corresponding input fields and press the according *set* buttons.
 
 ### How to Play a Round
 
-Please take the time to watch an episode (of the german version) of family feud.
+Please take the time to watch an episode (of the German version) of family feud.
 The controls are very basic. Click on the according answer button and the answer
-will appear. After a short dealy the corresponding points will appear.
+will appear. After a short delay the corresponding points will appear.
 
-If someone gives a wrong answer during the inital fight that decides which team
+If someone gives a wrong answer during the initial fight that decides which team
 will play the round press the *Wrong(non counting)* button to get the wrong
 answer buzzer sound.
 
