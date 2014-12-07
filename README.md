@@ -17,6 +17,7 @@ Dependencies
 
 python2.7 (since pygame only works with python2)
 pygame
+DejaVu Sans Mono
 
 
 Howto
