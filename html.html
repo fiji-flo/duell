@@ -6,13 +6,13 @@
 <script src="jquery-2.0.2.min.js" type="text/javascript"></script>
 <div align="center">
     <div id="loads">
-        <button id="init" style="width:100px;">Initialize</button>
-        <button id="showrounds" style="width:100px;">Rounds</button>
-        <button id="showanswers" style="width:100px;">Answers</button>
-        <button id="showfinal" style="width:100px;">Final</button><br>
+        <button id="init" style="width:100px;">Initialize Game Screen</button>
+        <button id="showrounds" style="width:100px;">Show/Hide Rounds</button>
+        <button id="showanswers" style="width:100px;">Show/Hide Answers</button>
+        <button id="showfinal" style="width:100px;">Show/Hide Final</button><br>
         <input id="gname" style="width:100px;"></input>
-        <button id="loadg" style="width:100px;">Load</button><br>
-        <button id="showidle" style="width:200px;">Idle</button>
+        <button id="loadg" style="width:100px;">Load Game</button><br>
+        <button id="showidle" style="width:200px;">Idle Screen</button>
     </div>
     <div id="rounds">
         <div style="height:30px;"><br></div>
@@ -26,6 +26,7 @@
     </div>
     <div id="answers">
         <div style="height:30px;"><br></div>
+        <div id="question"></div>
         <button id="wrongsound" style="width:200px;">Wrong(non counting)</button><br>
         <button id="solver0" style="width:200px;">Answer1</button><br>
         <button id="solver1" style="width:200px;">Answer2</button><br>
@@ -35,15 +36,15 @@
         <button id="solver5" style="width:200px;">Answer6</button><br>
         <button id="wrong1" style="width:200px;">Wrong</button><br>
         <button id="set_taname" style="width:50px;">Set</button>
-        <input id="tanamei" style="width:100px;"></input>
-        <input id="tbnamei" style="width:100px;"></input>
+        <input id="tanamei" style="width:100px;" placeholder="name of team a"></input>
+        <input id="tbnamei" style="width:100px;" placeholder="name of team b"></input>
         <button id="set_tbname" style="width:50px;">Set</button><br>
         <button id="ta" style="width:100px;">team a</button>
         <button id="tb" style="width:100px;">team b</button><br>
         <input id="pai" style="width:50px;"></input>
         <button id="pa" style="width:50px;">a</button>
         <button id="pb" style="width:50px;">b</button>
-        <input id="pb1" style="width:50px;"></input>
+        <input id="pbi" style="width:50px;"></input>
     </div>
     <div id="final">
         <div style="height:30px;"><br></div>
@@ -199,9 +200,10 @@ $("#setfinal").click(function() {
     });
 });
 function set_answers(data, num) {
-    var l = data.split("###")
-    var q = l[0]
-    l = l[1].split("##")
+    var l = data.split("###");
+    var q = l[0];
+    $("#question").html(q);       
+    l = l[1].split("##");
     for (var i = 0; i < 6; i++) {
         if (i < ans_num[num]) {
             $("#solver"+i).show()

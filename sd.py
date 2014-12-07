@@ -39,7 +39,7 @@ def srvr(q, r, x):
                 s.end_headers()
                 q.put(urllib.unquote(s.path.split("?")[1]))
                 data = r.get(True,2 )
-                s.wfile.write(bytes(data))
+                s.wfile.write(bytes(data.encode("utf-8")))
                 return
             s.send_header("Content-type", "text/html")
             s.end_headers()
@@ -114,7 +114,7 @@ class Round(Question):
         self.solved = []
 
     def get_data(self):
-        ret = "{}###{}".format(self.question, "##".join(["{}#{}".format(a,p) for (a,p) in self.answers]))
+        ret = u"{}###{}".format(self.question, u"##".join([u"{}#{}".format(a,p) for (a,p) in self.answers]))
         return ret
 
 class Final(object):
@@ -133,8 +133,8 @@ class Final(object):
     def get_data(self):
         qs = []
         for q in self.questions:
-            qs.append("{}###{}".format(q.question, "##".join(["{}#{}".format(a,p) for (a,p) in q.answers])))
-        return "####".join(qs)
+            qs.append(u"{}###{}".format(q.question, u"##".join([u"{}#{}".format(a,p) for (a,p) in q.answers])))
+        return u"####".join(qs)
 
 class Game(object):
     def __init__(self):
@@ -225,7 +225,7 @@ class Game(object):
 
     def load(self, filename):
         try:
-            l = open(filename).read()
+            l = open(filename).read().decode("utf-8")
             rnds,f = l.split("#final")
             rnds = rnds.strip().split("#round")
             rnds_to_load = []
@@ -341,7 +341,7 @@ class Renderer(object):
         snd_last_y = last_y - self._small_font.get_linesize()
         # team a
         output_string = '{}'.format(game.team_a.name)
-        text = self._small_font.render(output_string.encode("utf-8"),True,self._green)
+        text = self._small_font.render(output_string,True,self._green)
         self._screen.blit(text, [0, snd_last_y])
         output_string = '{}'.format(game.team_a.points)
         text = self._small_font.render(output_string,True,self._green)
@@ -349,7 +349,7 @@ class Renderer(object):
 
         #team_b
         output_string = '{}'.format(game.team_b.name)
-        text = self._small_font.render(output_string.encode("utf-8"),True,self._green)
+        text = self._small_font.render(output_string,True,self._green)
         self._screen.blit(text, [self._width - text.get_size()[0], snd_last_y])
         output_string = '{}'.format(game.team_b.points)
         text = self._small_font.render(output_string,True,self._green)
@@ -439,7 +439,7 @@ class Renderer(object):
             p = "--"
         n = min(game.solving_state, len(a))
         m = game.solving_state - n
-        s = "{}{}{}".format(a[:n], " "*m, "."*(game.alen - (n+m)))
+        s = u"{}{}{}".format(a[:n], " "*m, "."*(game.alen - (n+m)))
         game.solving_state += ((self._frame_count - game.solving_start) % 5) // 4
         return s,p
 
@@ -453,21 +453,21 @@ class Renderer(object):
 
     def draw_answer_final_a(self, num, atext="."*12, points="--"):
         y = ((self._height * 0.7) / 5) * 0.9 * (num + 1)
-        display_text = '{}: {:<16} {:>2}'.format((num + 1), atext.encode("utf-8"), points)
+        display_text = '{}: {:<16} {:>2}'.format((num + 1), atext, points)
         text = self._tiny_font.render(display_text, True, self._green)
         self._screen.blit(text, [self._width*0.02,y])
 
 
     def draw_answer_final_b(self, num, atext="."*12, points="--"):
         y = ((self._height * 0.7) / 5) * 0.9 * (num + 1)
-        display_text = '{:>2} {:<16} :{}'.format(points, atext.encode("utf-8"), (num+1))
+        display_text = '{:>2} {:<16} :{}'.format(points, atext, (num+1))
         text = self._tiny_font.render(display_text, True, self._green)
         self._alen = 20
         self._screen.blit(text, [self._width*0.98-text.get_size()[0],y])
 
     def draw_answer(self, num, atext="."*16, points="--"):
         y = ((self._height * 0.7) / 6) * 0.9 * (num + 1)
-        display_text = '{}: {:<20} {:>2}'.format((num + 1), atext.encode("utf-8"), points)
+        display_text = u'{}: {:<20} {:>2}'.format((num + 1), atext, points)
         text = self._small_font.render(display_text, True, self._green)
         self._screen.blit(text, [self.center(text),y])
 
@@ -574,7 +574,7 @@ class Session(object):
 def main():
     title = "Studierenden Duell"
     if len(sys.argv) > 1:
-        title = sys.argv[1]
+        title = sys.argv[1].decode("utf-8")
     q = Queue()
     r = Queue()
     x = Queue()
